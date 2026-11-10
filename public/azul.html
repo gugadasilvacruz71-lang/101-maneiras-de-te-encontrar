@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101b3b"><title>Azul, para você</title>
+<style>
+:root{color-scheme:dark;--ink:#f8f5ff;--muted:#c7cbe2;--blue:#7ca7ff;--pink:#f3a8d0}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font-family:Georgia,serif;background:radial-gradient(ellipse at 12% 8%,#244d8b 0,transparent 42%),radial-gradient(ellipse at 88% 82%,#743b78 0,transparent 43%),linear-gradient(145deg,#08142d,#17152f 55%,#301d42);overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;width:55vw;height:55vw;max-width:700px;max-height:700px;border-radius:50%;filter:blur(80px);opacity:.19;pointer-events:none;animation:drift 14s ease-in-out infinite alternate}
+body:before{background:#4e91ff;top:-24vw;left:-15vw}body:after{background:#f18ac2;bottom:-28vw;right:-16vw;animation-delay:-7s}
+@keyframes drift{to{transform:translate(8vw,5vh) scale(1.2)}}
+main{position:relative;width:min(100% - 32px,850px);margin:auto;padding:clamp(55px,10vw,100px) 0 70px;text-align:center}
+.kicker{font:10px Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#d7d8f4}
+h1{font-weight:400;font-size:clamp(48px,9vw,82px);letter-spacing:-.05em;line-height:1;margin:22px 0}
+.lead{font-size:clamp(17px,3vw,21px);line-height:1.8;color:#e1def0;max-width:620px;margin:0 auto}
+.spark{color:#f4b5d6;font-size:24px;margin:28px}
+.panel{margin:42px auto 0;max-width:560px;padding:clamp(25px,6vw,48px);border:1px solid #ffffff2c;background:#ffffff0d;backdrop-filter:blur(14px);border-radius:22px;box-shadow:0 24px 80px #0003}
+input{width:100%;padding:16px 18px;border:1px solid #ffffff55;background:#ffffff12;color:white;border-radius:12px;font:16px Arial,sans-serif;outline:none;text-align:center}
+input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #f3a8d033}
+button,.download{display:inline-block;margin-top:15px;padding:15px 24px;border:0;border-radius:99px;background:linear-gradient(100deg,#719cff,#e99bc8);color:#101b3b;font:700 11px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-decoration:none}
+#error{min-height:24px;color:#ffc5dc;font:13px Arial,sans-serif;margin:14px 0 0}
+video{width:100%;max-height:75vh;border-radius:16px;background:#050914;margin-top:25px}
+.quote{font-size:clamp(19px,3.5vw,25px);line-height:1.7;color:#f1eaf6;margin:36px auto;max-width:650px}
+.note{font-size:17px;line-height:1.9;color:#d8d7e9;max-width:650px;margin:24px auto}
+.hidden{display:none!important}.download{margin-top:24px}.footer{font:10px Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c4bddb;margin-top:65px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important}}
+</style></head>
+<body><main>
+<div class="kicker">um pequeno lugar feito de voz e carinho</div>
+<div class="spark">✧</div>
+<h1>Azul, para você.</h1>
+<p class="lead">Uma canção, uma voz e todas as delicadezas que me fazem lembrar você.</p>
+<section id="gate" class="panel">
+<p class="note">Alguns lugares têm portas. Este tem uma cor.<br><br>Qual é a cor favorita de quem preparou esta surpresa para você?</p>
+<form id="login"><input id="password" type="password" placeholder="A cor..." autocomplete="off" aria-label="Senha"><button type="submit">Abrir este cantinho</button></form>
+<p id="error" role="status"></p>
+</section>
+<section id="inside" class="hidden">
+<div class="panel">
+<p class="kicker">para você, com todo o meu carinho</p>
+<video id="cover" controls playsinline preload="metadata">
+<source src="/api/azul/video" type="video/mp4">
+Seu navegador não conseguiu reproduzir este vídeo.
+</video>
+<a class="download" href="/api/azul/video" download="Azul-para-voce.mp4">Guardar o vídeo</a>
+</div>
+<p class="quote">“Há pessoas que parecem carregar o próprio céu na maneira de existir.”</p>
+<p class="note">Sua delicadeza tem cores que nenhuma pintura conseguiria reproduzir. E se a beleza pudesse assumir uma melodia, eu provavelmente encontraria você nela.</p>
+<p class="quote">“Se eu pudesse transformar carinho em paisagem, escolheria um céu azul encontrando o rosa do entardecer.”</p>
+<p class="note">Preparei esta canção pensando em você. Não para que ela fosse perfeita, mas para que pudesse levar um pedacinho do que sinto até onde você está.</p>
+</section>
+<div class="footer">feito com carinho, especialmente para você</div>
+</main>
+<script>
+const gate=document.getElementById("gate"),inside=document.getElementById("inside"),form=document.getElementById("login"),error=document.getElementById("error"),password=document.getElementById("password");
+function openPortal(){gate.classList.add("hidden");inside.classList.remove("hidden");}
+fetch("/api/azul/session",{cache:"no-store"}).then(r=>r.json()).then(d=>{if(d.authenticated)openPortal()}).catch(()=>{});
+form.addEventListener("submit",async e=>{e.preventDefault();error.textContent="";try{const r=await fetch("/api/azul/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:password.value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Não foi possível entrar.");openPortal();}catch(err){error.textContent=err.message;password.select();}});
+</script></body></html>

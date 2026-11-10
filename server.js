@@ -30,13 +30,15 @@ app.post("/api/azul/login",(req,res)=>{
   const submitted=String(req.body?.password||"");
   if(!PORTAL_PASSWORD||!SESSION_SECRET)return res.status(503).json({error:"O portal ainda está sendo configurado."});
   const a=Buffer.from(submitted),b=Buffer.from(PORTAL_PASSWORD);
-  if(a.length!==b.length||!crypto.timingSafeEqual(a,b))return res.status(401).json({error:"Essa cor não abriu a porta. Tente novamente."});
+  if(a.length!==b.length||!crypto.timingSafeEqual(a,b)){console.log("AZUL_EVENT "+JSON.stringify({event:"login_failed",at:new Date().toISOString()}));return res.status(401).json({error:"Essa cor não abriu a porta. Tente novamente."});}
+  console.log("AZUL_EVENT "+JSON.stringify({event:"login_success",at:new Date().toISOString()}));
   const expires=String(Date.now()+12*60*60*1000);
   const token=expires+"."+sign(expires);
   res.setHeader("Set-Cookie","azul_session="+encodeURIComponent(token)+"; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
   res.json({ok:true});
 });
 app.get("/api/azul/session",(req,res)=>res.json({authenticated:hasPortalAccess(req)}));
+app.post("/api/azul/event",requirePortal,(req,res)=>{const allowed=["page_open","video_play"];const event=String(req.body?.event||"");if(!allowed.includes(event))return res.status(400).json({ok:false});console.log("AZUL_EVENT "+JSON.stringify({event,at:new Date().toISOString()}));res.json({ok:true});});
 app.get("/api/azul/video",requirePortal,async(req,res)=>{
   if(!VIDEO_URL)return res.status(503).send("O vídeo ainda está sendo conectado ao portal.");
   try{
